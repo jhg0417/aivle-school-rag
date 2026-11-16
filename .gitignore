@@ -1,0 +1,13 @@
+.streamlit/secrets.toml
+.aivle_data/
+chroma_db/
+__pycache__/
+*.py[cod]
+.env
+api_key.txt
+
+# 교육자료/개인정보/시크릿 업로드 금지
+*.pdf
+*.docx
+*.txt.bak
+.ipynb_checkpoints/
