@@ -490,34 +490,9 @@ with right:
     st.markdown(f'<div class="aivle-stat"><small>대화 기록</small><b>{sum(m["role"]=="user" for m in st.session_state.messages)}개 질문</b></div>', unsafe_allow_html=True)
 
 
-# 문서 업로드는 필수이며, 서버 파일이나 Drive에서 자동으로 불러오지 않는다.
+# 사이드바: 요청한 네 개 메뉴만 표시, 클릭하면 세부 설정을 펼칩니다.
 with st.sidebar:
-    st.markdown('<div class="sidebar-brand"><em>✳</em> AIVLE</div>', unsafe_allow_html=True)
-    st.caption("AIVLE School 학습 도우미")
-    st.divider()
-    st.subheader("📎 PDF 자료 추가 · 필수")
-    uploaded = st.file_uploader(
-        "질문에 사용할 AIVLE School PDF를 직접 선택하세요",
-        type=["pdf"],
-        help="수동으로 PDF를 선택해야 RAG가 시작됩니다. 자동 업로드는 하지 않습니다.",
-        key="manual_pdf_upload",
-    )
-    st.caption("🔒 PDF 파일은 GitHub에 업로드하지 않습니다.")
-    st.divider()
-
-    st.subheader("🔎 검색 설정")
-    search_type = st.selectbox("검색 방식", ["mmr", "similarity"], index=0)
-    k = st.slider("검색 문단 수", min_value=3, max_value=10, value=6)
-
-    st.divider()
-    st.subheader("🎧 음성 답변 설정")
-    st.toggle(
-        "텍스트 질문에도 음성 답변",
-        key="voice_reply_to_text",
-        help="켜면 직접 입력하거나 추천 질문을 눌러도 음성 파일이 생성됩니다. 음성 질문은 항상 음성 답변을 생성합니다.",
-    )
-    # '추천 질문 메뉴'를 열고 주제를 고르면 해당 질문 5개를 표시합니다.
-    with st.expander("💡 추천 질문 메뉴", expanded=False):
+    with st.expander("💡 추천 질문", expanded=False):
         selected_topic = st.selectbox(
             "질문 주제 선택",
             options=list(RECOMMENDED_QUESTIONS.keys()),
@@ -531,41 +506,64 @@ with st.sidebar:
             ):
                 st.session_state.pending_question = example
                 st.rerun()
-    st.divider()
-    st.subheader("🗑️ 대화 관리")
-    if st.button("마지막 질문·답변 삭제", use_container_width=True):
-        messages = st.session_state.messages
-        if messages:
-            if messages[-1]["role"] == "assistant":
-                messages.pop()
-            if messages and messages[-1]["role"] == "user":
-                messages.pop()
-        st.session_state.pop("pending_question", None)
-        st.rerun()
-    if st.button("전체 대화 삭제", type="secondary", use_container_width=True):
-        st.session_state.messages = []
-        st.session_state.pop("pending_question", None)
-        st.rerun()
 
-    if st.session_state.messages:
-        transcript = "\n\n".join(
-            ("사용자" if m["role"] == "user" else "AI 도우미")
-            + ":\n" + m["content"]
-            for m in st.session_state.messages
+    with st.expander("🎧 음성 설정", expanded=False):
+        st.toggle(
+            "텍스트 질문에도 음성 답변",
+            key="voice_reply_to_text",
+            help="켜면 직접 입력하거나 추천 질문을 눌러도 음성 파일이 생성됩니다. 음성 질문은 항상 음성 답변을 생성합니다.",
         )
-        st.download_button("📥 대화 내역 TXT 다운로드",
-                           data=transcript.encode("utf-8-sig"),
-                           file_name="aivle_chat.txt", mime="text/plain",
-                           use_container_width=True)
-    st.caption("대화 기록은 현재 브라우저 세션에만 보관됩니다.")
 
+    with st.expander("🔎 검색 설정", expanded=False):
+        search_type = st.selectbox("검색 방식", ["mmr", "similarity"], index=0)
+        k = st.slider("검색 문단 수", min_value=3, max_value=10, value=6)
+
+    with st.expander("🗑️ 대화 관리", expanded=False):
+        if st.button("마지막 질문·답변 삭제", use_container_width=True):
+            messages = st.session_state.messages
+            if messages:
+                if messages[-1]["role"] == "assistant":
+                    messages.pop()
+                if messages and messages[-1]["role"] == "user":
+                    messages.pop()
+            st.session_state.pop("pending_question", None)
+            st.rerun()
+        if st.button("전체 대화 삭제", type="secondary", use_container_width=True):
+            st.session_state.messages = []
+            st.session_state.pop("pending_question", None)
+            st.rerun()
+
+        if st.session_state.messages:
+            transcript = "\n\n".join(
+                ("사용자" if m["role"] == "user" else "AI 도우미")
+                + ":\n" + m["content"]
+                for m in st.session_state.messages
+            )
+            st.download_button(
+                "📥 대화 내역 TXT 다운로드",
+                data=transcript.encode("utf-8-sig"),
+                file_name="aivle_chat.txt",
+                mime="text/plain",
+                use_container_width=True,
+            )
+        st.caption("대화 기록은 현재 브라우저 세션에만 보관됩니다.")
+
+# PDF 업로드는 사이드바 대신 본문 '백서 준비' 영역에 배치합니다.
+st.subheader("📄 백서 준비")
+uploaded = st.file_uploader(
+    "최종 팀 통합 백서 PDF 업로드",
+    type=["pdf"],
+    help="PDF를 선택하면 해당 문서로 검색 인덱스를 준비합니다.",
+    key="manual_pdf_upload",
+)
+st.caption("🔒 PDF 파일은 GitHub에 업로드하지 않습니다.")
 
 if not configure_api_key():
     st.error("OpenAI API 키가 없습니다. Streamlit Secrets에 OPENAI_API_KEY를 등록하세요.")
     st.stop()
 
 if uploaded is None:
-    st.info("왼쪽에서 **최종 팀 통합 백서 PDF**를 업로드하면 질문을 시작할 수 있어요.")
+    st.info("위에서 **최종 팀 통합 백서 PDF**를 업로드하면 질문을 시작할 수 있어요.")
     st.markdown("**사용 순서:** PDF 업로드 → 인덱싱 완료 → 추천 질문 클릭 또는 직접 질문")
     st.stop()
 
@@ -699,3 +697,4 @@ if question and question.strip():
             st.caption(f"오류 유형: {type(exc).__name__}")
 
 st.caption("이 챗봇은 업로드한 PDF에서 검색한 내용을 근거로 답합니다. 음성은 OpenAI STT/TTS API를 통해 처리됩니다.")
+
