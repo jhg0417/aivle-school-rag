@@ -34,7 +34,7 @@ st.markdown(
       .aivle-title {display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
       .aivle-title h1 {font-size:29px;font-weight:850;color:white;margin:0;line-height:1.2;letter-spacing:-.04em;}
       .aivle-hero p {color:#e4fffb;margin:17px 0 0;font-size:14px;}
-      .aivle-ghost {height:47px;width:47px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.15));}
+      .aivle-ghost {height:76px;width:76px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 2px 4px rgba(0,0,0,.15));}
       .aivle-stat {background:white;border:1px solid #e7eeee;padding:15px 18px;border-radius:17px;min-height:76px;box-shadow:0 3px 10px rgba(15,65,75,.03);}
       .aivle-stat small {display:block;font-size:11px;color:#6e9697;margin-bottom:6px;}
       .aivle-stat b {color:#253441;font-size:15px;}
@@ -434,9 +434,9 @@ st.markdown(
       <div class="aivle-eyebrow">KT AIVLE SCHOOL · STUDY ASSISTANT</div>
       <div class="aivle-title">
         <h1>AIVLE 백서에게 물어보세요</h1>
-        <img class="aivle-ghost" src="{html.escape(DANNY_IMAGE, quote=True)}"
-             alt="AIVLE 유령 캐릭터 다니"
-             onerror="this.outerHTML='👻'" />
+        <img class="aivle-ghost"
+             src="https://raw.githubusercontent.com/jhg0417/aivle-school-rag/main/character.png"
+             alt="AIVLE 캐릭터" />
       </div>
       <p>업로드한 AIVLE 백서를 바탕으로 궁금한 점을 설명해 드릴게요.</p>
     </section>""",
